@@ -12,6 +12,12 @@ class MusicViewController: UIViewController {
     
     @IBOutlet weak var musicTableView: UITableView!
     
+    @IBOutlet weak var activityView: UIView!
+    
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    
+    //MARK: - genres data comes from server according do Genre model. (Inside Music model)
+    
     var genres: [Genre]? = []
     
     override func viewDidLoad() {
@@ -22,16 +28,12 @@ class MusicViewController: UIViewController {
         musicTableView.register(.init(nibName: "MusicTableViewCell", bundle: nil), forCellReuseIdentifier: "MusicTableViewCell")
         musicTableView.separatorStyle = .none
         
+        activityIndicator.startAnimating()
+        activityIndicator.hidesWhenStopped = true
         fetchMusicData()
     }
     
-    public func configure(with genres: [Genre]) {
-            self.genres = genres
-            DispatchQueue.main.async { [weak self] in
-                self?.musicTableView.reloadData()
-            }
-        }
-    
+    //MARK: - Data is being fetched from server and assigned to genres variable.
     
     func fetchMusicData() {
         
@@ -54,6 +56,8 @@ class MusicViewController: UIViewController {
                         
                         DispatchQueue.main.async {
                             self.musicTableView.reloadData()
+                            self.activityIndicator.stopAnimating()
+                            self.activityView.isHidden = true
                         }
                     } catch {
                         print("decoding error")
@@ -75,7 +79,7 @@ class MusicViewController: UIViewController {
 extension MusicViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        let alert = UIAlertController(title: "COMING SOON", message: "Radio feature will be added soon.", preferredStyle: .alert)
+        let alert = UIAlertController(title: "COMING SOON", message: "\(genres?[indexPath.row].title ?? "") is coming soon.", preferredStyle: .alert)
         let okButton = UIAlertAction(title: "Close", style: .cancel)
         alert.addAction(okButton)
         self.present(alert, animated: true)
@@ -93,6 +97,9 @@ extension MusicViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = musicTableView.dequeueReusableCell(withIdentifier: "MusicTableViewCell", for: indexPath) as! MusicTableViewCell
         
+        
+        //MARK: Images being shown on each cell. You can show titles instead of images if you wish.
+        
 //        cell.textLabel?.text = genres?[indexPath.row].title
         cell.musicImageView.sd_setImage(with: URL(string: genres?[indexPath.row].imageURL ?? ""))
         cell.musicImageView.contentMode = .scaleAspectFill
@@ -103,6 +110,6 @@ extension MusicViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 150
+        return UIScreen.main.bounds.height / 5
     }
 }

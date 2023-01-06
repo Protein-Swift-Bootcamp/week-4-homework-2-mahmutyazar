@@ -1,5 +1,3 @@
-# week-4-homework-2
-
 ## What's happening inside the app?
 
 **You can search universities by countries with this app. You can also see music genres of TRT Radio.**
